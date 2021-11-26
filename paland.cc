@@ -45,7 +45,7 @@
 
 // Compile nanoprintf in this translation unit.
 #define NANOPRINTF_IMPLEMENTATION
-#include "../nanoprintf.h"
+#include "../../nanoprintf.h"
 
 namespace {
 void require_conform(const std::string& expected, char const *fmt, ...) {
