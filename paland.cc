@@ -29,7 +29,7 @@
 // Rewritten for nanoprintf by Charles Nicholson (charles.nicholson@gmail.com)
 // A derivative work of Paland's original, so released under the MIT License.
 
-#include "doctest.h"
+#include "../doctest.h"
 
 #include <string.h>
 #include <math.h>
