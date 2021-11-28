@@ -448,7 +448,7 @@ TEST_CASE("float padding neg numbers") {
   // zero padding no decimal point
   require_conform("-5",         "%01.0f", -5.);
   require_conform("-5",         "%02.0f", -5.);
-  //require_conform("-05",        "%03.0f", -5.);
+  require_conform("-05",        "%03.0f", -5.);
 
 #if 0
   require_conform("-005.0e+00", "%010.1e", -5.);
