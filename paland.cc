@@ -190,7 +190,7 @@ TEST_CASE("# flag") {
   require_conform("0x1001",     "%#04x",   0x1001);
   require_conform("01001",      "%#04o",    01001);
   require_conform("",           "%#.0x",        0);
-//  require_conform("0x0000614e", "%#.8x",   0x614e );  FIXME
+  require_conform("0x0000614e", "%#.8x",   0x614e);
 }
 
 TEST_CASE("# flag - non-standard format") {
@@ -213,7 +213,7 @@ TEST_CASE("# flag with long-long") {
   require_conform("0x1001",     "%#04llx", (long long)0x1001);
   require_conform("01001",      "%#04llo", (long long) 01001);
   require_conform("",           "%#.0llx", (long long)     0);
-//  require_conform("0x0000614e", "%#.8llx", (long long)0x614e); FIXME
+  require_conform("0x0000614e", "%#.8llx", (long long)0x614e);
 }
 
 TEST_CASE("# flag with long-long - non-standard format") {
@@ -375,10 +375,10 @@ TEST_CASE("padding #020 - non-standard format") {
 TEST_CASE("padding #020") {
   require_conform("00000000000000000777", "%#020o", 511);
   require_conform("00000000037777777001", "%#020o", 4294966785U);
-  // require_conform("0x00000000001234abcd", "%#020x", 305441741);   FIXME
-  // require_conform("0x0000000000edcb5433", "%#020x", 3989525555U); FIXME
-  // require_conform("0X00000000001234ABCD", "%#020X", 305441741);   FIXME
-  // require_conform("0X0000000000EDCB5433", "%#020X", 3989525555U); FIXME
+  require_conform("0x00000000001234abcd", "%#020x", 305441741);
+  require_conform("0x0000000000edcb5433", "%#020x", 3989525555U);
+  require_conform("0X00000000001234ABCD", "%#020X", 305441741);
+  require_conform("0X0000000000EDCB5433", "%#020X", 3989525555U);
 }
 
 TEST_CASE("padding #20 - non-standard format") {
