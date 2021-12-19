@@ -492,10 +492,9 @@ TEST_CASE("length - non-standard format") {
 }
 
 TEST_CASE("float") {
-  // test special-case floats using math.h macros
   require_conform("     nan",  "%8f", (double)NAN);
   require_conform("     inf",  "%8f", (double)INFINITY);
-//  require_conform("-inf    ",  "%-8f", (double)-INFINITY);
+  require_conform("-inf    ",  "%-8f", (double)-INFINITY);
 
 #if 0
   require_conform("    +inf",  "%+8e", (double)INFINITY);
