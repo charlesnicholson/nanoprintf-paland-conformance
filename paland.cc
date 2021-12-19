@@ -36,6 +36,7 @@
 #include <limits>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
@@ -48,7 +49,7 @@
 #include "../../nanoprintf.h"
 
 namespace {
-void require_conform(const std::string& expected, char const *fmt, ...) {
+void require_conform(char const *expected, char const *fmt, ...) {
   char buf[256];
 
   std::string npf_result; {
@@ -69,11 +70,12 @@ void require_conform(const std::string& expected, char const *fmt, ...) {
     sys_result = buf;
   }
 
-  if (npf_result != expected) {
-    MESSAGE(sys_result);
+  if (expected) {
+    if (npf_result != std::string{expected}) { MESSAGE(sys_result); }
+    REQUIRE(npf_result == std::string{expected});
+  } else {
+    REQUIRE(npf_result == sys_result);
   }
-
-  REQUIRE(npf_result == expected);
 }
 }
 
@@ -611,31 +613,6 @@ TEST_CASE("float") {
 //   CHECK(!strcmp(buffer, ""));
 // #endif
 // #endif
-
-  // brute force float
-  bool fail = false;
-  std::stringstream sstr;
-  sstr.precision(5);
-  for (float i = -100000; i < 100000; i += 1) {
-    test::sprintf_(buffer, "%.5f", (double)(i / 10000));
-    sstr.str("");
-    sstr << std::fixed << i / 10000;
-    fail = fail || !!strcmp(buffer, sstr.str().c_str());
-  }
-  CHECK(!fail);
-
-//#if PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS
-//  // This is tested when _both_ decimal and exponential specifiers are supported.
-//  // brute force exp
-//  sstr.setf(std::ios::scientific, std::ios::floatfield);
-//  for (float i = (float) -1e20; i < (float) 1e20; i += (float) 1e15) {
-//    test::sprintf_(buffer, "%.5f", (double) i);
-//    sstr.str("");
-//    sstr << i;
-//    fail = fail || !!strcmp(buffer, sstr.str().c_str());
-//  }
-//  CHECK(!fail);
-//#endif
 #endif
 }
 
@@ -758,66 +735,21 @@ TEST_CASE("misc") {
 #endif
 }
 
-#if 0
-
-TEST_CASE("extremal signed integer values", "[]" ) {
-  char buffer[100];
-  char expected[100];
-
-  std::sprintf(expected, "%hhd", std::numeric_limits<char>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%hhd", std::numeric_limits<char>::max());
-
-  std::sprintf(expected, "%hd", std::numeric_limits<short int>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%hd", std::numeric_limits<short int>::max());
-
-  std::sprintf(expected, "%hd", std::numeric_limits<short int>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%hd", std::numeric_limits<short int>::max());
-
-  std::sprintf(expected, "%d", std::numeric_limits<int>::min());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%d", std::numeric_limits<int>::min());
-
-  std::sprintf(expected, "%d", std::numeric_limits<int>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%d", std::numeric_limits<int>::max());
-
-  std::sprintf(expected, "%ld", std::numeric_limits<long int>::min());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%ld", std::numeric_limits<long int>::min());
-
-  std::sprintf(expected, "%ld", std::numeric_limits<long int>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%ld", std::numeric_limits<long int>::max());
-
-#if PRINTF_SUPPORT_LONG_LONG
-  std::sprintf(expected, "%lld", std::numeric_limits<long long int>::min());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%lld", std::numeric_limits<long long int>::min());
-
-  std::sprintf(expected, "%lld", std::numeric_limits<long long int>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%lld", std::numeric_limits<long long int>::max());
-#endif
+TEST_CASE("extremal signed integer values") {
+  require_conform(nullptr, "%hhd", std::numeric_limits<char>::max());
+  require_conform(nullptr, "%hd", std::numeric_limits<short int>::max());
+  require_conform(nullptr, "%d", std::numeric_limits<int>::min());
+  require_conform(nullptr, "%d", std::numeric_limits<int>::max());
+  require_conform(nullptr, "%ld", std::numeric_limits<long int>::min());
+  require_conform(nullptr, "%ld", std::numeric_limits<long int>::max());
+  require_conform(nullptr, "%lld", std::numeric_limits<long long int>::min());
+  require_conform(nullptr, "%lld", std::numeric_limits<long long int>::max());
 }
 
-TEST_CASE("extremal unsigned integer values", "[]" ) {
-  char buffer[100];
-  char expected[100];
-
-  std::sprintf(expected, "%hhu", std::numeric_limits<char unsigned>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%hhu", std::numeric_limits<char unsigned>::max());
-
-  std::sprintf(expected, "%hu", std::numeric_limits<short unsigned>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%hu", std::numeric_limits<short unsigned>::max());
-
-  std::sprintf(expected, "%u", std::numeric_limits<unsigned>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%u", std::numeric_limits<unsigned>::max());
-
-  std::sprintf(expected, "%lu", std::numeric_limits<long unsigned>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%lu", std::numeric_limits<long unsigned>::max());
-
-#if PRINTF_SUPPORT_LONG_LONG
-  std::sprintf(expected, "%llu", std::numeric_limits<long long unsigned>::max());
-  PRINTING_CHECK(expected, ==, test::sprintf_, buffer, "%llu", std::numeric_limits<long long unsigned>::max());
-#endif
+TEST_CASE("extremal unsigned integer values") {
+  require_conform(nullptr, "%hhu", std::numeric_limits<char unsigned>::max());
+  require_conform(nullptr, "%hu", std::numeric_limits<short unsigned>::max());
+  require_conform(nullptr, "%u", std::numeric_limits<unsigned>::max());
+  require_conform(nullptr, "%lu", std::numeric_limits<long unsigned>::max());
+  require_conform(nullptr, "%llu", std::numeric_limits<long long unsigned>::max());
 }
-
-
-#ifdef TEST_WITH_NON_STANDARD_FORMAT_STRINGS
-DISABLE_WARNING_POP
-#endif
-#endif
