@@ -657,48 +657,17 @@ TEST_CASE("types - non-standard format") {
   // require_conform("101111000110000101001110", "%lb", 12345678L);
 }
 
-// TEST_CASE("pointer", "[]" ) {
-//   char buffer[100];
-//
-//   CAPTURE_AND_PRINT(test::sprintf_, buffer, "%p", (void*)0x1234U);
-//   if (sizeof(void*) == 4U) {
-//     CHECK(!strcmp(buffer, "0x00001234"));
-//   }
-//   else {
-//     CHECK(!strcmp(buffer, "0x0000000000001234"));
-//   }
-//
-//   CAPTURE_AND_PRINT(test::sprintf_, buffer, "%p", (void*)0x12345678U);
-//   if (sizeof(void*) == 4U) {
-//     CHECK(!strcmp(buffer, "0x12345678"));
-//   }
-//   else {
-//     CHECK(!strcmp(buffer, "0x0000000012345678"));
-//   }
-//
-//   CAPTURE_AND_PRINT(test::sprintf_, buffer, "%p-%p", (void*)0x12345678U, (void*)0x7EDCBA98U);
-//   if (sizeof(void*) == 4U) {
-//     CHECK(!strcmp(buffer, "0x12345678-0x7edcba98"));
-//   }
-//   else {
-//     CHECK(!strcmp(buffer, "0x0000000012345678-0x000000007edcba98"));
-//   }
-//
-//   if (sizeof(uintptr_t) == sizeof(uint64_t)) {
-//     test::sprintf_(buffer, "%p", (void*)(uintptr_t)0xFFFFFFFFU);
-//     CHECK(!strcmp(buffer, "0x00000000ffffffff"));
-//   }
-//   else {
-//     test::sprintf_(buffer, "%p", (void*)(uintptr_t)0xFFFFFFFFU);
-//     CHECK(!strcmp(buffer, "0xffffffff"));
-//   }
-//   PRINTING_CHECK("(nil)", ==, test::sprintf_, buffer, "%p", (const void*) NULL);
-// }
-//
-// TEST_CASE("unknown flag (non-standard format)", "[]" ) {
-//   char buffer[100];
-//   PRINTING_CHECK("kmarco", ==, test::sprintf_, buffer, "%kmarco", 42, 37);
-// }
+TEST_CASE("pointer") { // mpaland pads to register width (non-standard), npf doesn't.
+  require_conform("0x1234", "%p", (void *)0x1234u);
+  require_conform("0x12345678", "%p", (void *)0x12345678u);
+  require_conform(
+    "0x12345678-0x7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+  require_conform("0xffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+}
+
+TEST_CASE("unknown flag (non-standard format)") {
+  require_conform("%kmarco", "%kmarco"); // mpaland printf removes leading %
+}
 
 TEST_CASE("string length") {
   require_conform("This", "%.4s", "This is a test");
@@ -706,13 +675,13 @@ TEST_CASE("string length") {
   require_conform("123", "%.7s", "123");
   require_conform("", "%.7s", "");
   require_conform("1234ab", "%.4s%.2s", "123456", "abcdef");
-  // require_conform(".2s", "%.4.2s", "123456"); FIXME
   require_conform("123", "%.*s", 3, "123456");
-  // require_conform("(null)", "%.*s", 3, (const char*) NULL); FIXME
+  // require_conform("(null)", "%.*s", 3, (const char*) NULL);
 }
 
 TEST_CASE("string length (non-standard format)") {
-  // require_conform(".2s", "%.4.2s", "123456"); FIXME
+  // mpaland consumes malformed format string, npf does not.
+  require_conform("%.4.2s", "%.4.2s", "123456");
 }
 
 TEST_CASE("misc") {
