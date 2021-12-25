@@ -487,8 +487,8 @@ TEST_CASE("length") {
 }
 
 TEST_CASE("length - non-standard format") {
-  // require_conform("  ", "%02.0u", 0U);  FIXME
-  // require_conform("  ", "%02.0d", 0);   FIXME
+  require_conform("  ", "%02.0u", 0U);
+  require_conform("  ", "%02.0d", 0);
 }
 
 TEST_CASE("float") {
