@@ -38,13 +38,7 @@
 #include <iostream>
 #include <sstream>
 
-//#define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
-//#define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
-//#define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 1
-//#define NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS 1
-//#define NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS 1
-
-// Compile nanoprintf in this translation unit.
+// The configuration flags are injected by CMakeLists.txt in the npf project.
 #define NANOPRINTF_IMPLEMENTATION
 #include "../../nanoprintf.h"
 
@@ -146,35 +140,33 @@ TEST_CASE("+ flag - non-standard format") {
   require_conform("x",             "%+c", 'x');
 }
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("0 flag") {
   require_conform("42",              "%0d", 42);
   require_conform("42",              "%0ld", 42L);
   require_conform("-42",             "%0d", -42);
-
-#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
   require_conform("00042",           "%05d", 42);
   require_conform("-0042",           "%05d", -42);
   require_conform("000000000000042", "%015d", 42);
   require_conform("-00000000000042", "%015d", -42);
-#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
   require_conform("000000000042.12", "%015.2f", 42.1234);
   require_conform("00000000042.987", "%015.3f", 42.9876);
   require_conform("-00000042.98759", "%015.5f", -42.9876);
 #endif
-#endif
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("- flag") {
   require_conform("42",              "%-d", 42);
   require_conform("-42",             "%-d", -42);
-
-#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
   require_conform("42   ",           "%-5d", 42);
   require_conform("-42  ",           "%-5d", -42);
   require_conform("42             ", "%-15d", 42);
   require_conform("-42            ", "%-15d", -42);
-#endif
 }
+#endif
 
 #if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("- flag and non-standard 0 modifier for integers") {
@@ -344,7 +336,6 @@ TEST_CASE("width -20") {
   require_conform("1024                ", "%-20i", 1024);
   require_conform("-1024               ", "%-20i", -1024);
   require_conform("1024                ", "%-20u", 1024);
-  require_conform("1024.1234           ", "%-20.4f", 1024.1234);
   require_conform("4294966272          ", "%-20u", 4294966272U);
   require_conform("777                 ", "%-20o", 511);
   require_conform("37777777001         ", "%-20o", 4294966785U);
@@ -357,6 +348,10 @@ TEST_CASE("width -20") {
   require_conform("|   10| |10| |   10|", "|%5d| |%-2d| |%5d|", 10, 10, 10);
   require_conform("|    9| |9           | |    9|", "|%5d| |%-12d| |%5d|", 9, 9, 9);
   require_conform("|   10| |10          | |   10|", "|%5d| |%-12d| |%5d|", 10, 10, 10);
+
+#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
+  require_conform("1024.1234           ", "%-20.4f", 1024.1234);
+#endif
 }
 #endif
 
@@ -491,7 +486,8 @@ TEST_CASE("padding neg numbers") {
 }
 #endif
 
-#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
+#if (NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1)
 TEST_CASE("float padding neg numbers") {
   // space padding
   require_conform("-5.0",       "% 3.1f", -5.);
@@ -665,7 +661,6 @@ TEST_CASE("float") {
 //  PRINTING_CHECK("4.895512e+04",     "%e", 48955.125);
 //  PRINTING_CHECK("9.2524e+04",       "%.4e", 92523.5);
 //  PRINTING_CHECK("-8.380923438e+04", "%.9e", -83809.234375);
-
   // out of range for float: should switch to exp notation if supported, else empty
 // #if PRINTF_SUPPORT_DECIMAL_SPECIFIERS
 //   CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.1f", 1E20);
@@ -748,6 +743,7 @@ TEST_CASE("string length") {
   require_conform("1234ab", "%.4s%.2s", "123456", "abcdef");
   require_conform("123", "%.*s", 3, "123456");
 #endif
+  // npf is not tolerant of null string pointers.
   // require_conform("(null)", "%.*s", 3, (const char*) NULL);
 }
 
@@ -808,3 +804,27 @@ TEST_CASE("extremal unsigned integer values") {
   require_conform(nullptr, "%llu", std::numeric_limits<long long unsigned>::max());
 #endif
 }
+
+#if NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS == 1
+TEST_CASE("writeback specifier") {
+  char buffer[100];
+
+  struct {
+    char char_;
+    short short_;
+    int int_;
+    long long_;
+    long long long_long_;
+  } num_written;
+
+  num_written.int_ = 1234;
+  npf_snprintf(buffer, sizeof(buffer), "%n", &num_written.int_);
+  REQUIRE(num_written.int_ == 0);
+  REQUIRE(std::string{buffer} == "");
+
+  num_written.int_ = 1234;
+  npf_snprintf(buffer, sizeof(buffer), "foo%nbar", &num_written.int_);
+  REQUIRE(num_written.int_ == 3);
+  REQUIRE(std::string{buffer} == "foobar");
+}
+#endif
