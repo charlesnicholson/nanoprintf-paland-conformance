@@ -38,11 +38,11 @@
 #include <iostream>
 #include <sstream>
 
-#define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS 1
+//#define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
+//#define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
+//#define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 1
+//#define NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS 1
+//#define NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS 1
 
 // Compile nanoprintf in this translation unit.
 #define NANOPRINTF_IMPLEMENTATION
@@ -82,17 +82,22 @@ void require_conform(char const *expected, char const *fmt, ...) {
 TEST_CASE("space flag") {
   require_conform(" 42",             "% d", 42);
   require_conform("-42",             "% d", -42);
+  require_conform(" 1024",           "% d", 1024);
+  require_conform("-1024",           "% d", -1024);
+  require_conform(" 1024",           "% i", 1024);
+  require_conform("-1024",           "% i", -1024);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
   require_conform("   42",           "% 5d", 42);
   require_conform("  -42",           "% 5d", -42);
   require_conform("             42", "% 15d", 42);
   require_conform("            -42", "% 15d", -42);
   require_conform("            -42", "% 15d", -42);
+#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
   require_conform("        -42.986", "% 15.3f", -42.987);
   require_conform("         42.986", "% 15.3f", 42.987);
-  require_conform(" 1024",           "% d", 1024);
-  require_conform("-1024",           "% d", -1024);
-  require_conform(" 1024",           "% i", 1024);
-  require_conform("-1024",           "% i", -1024);
+#endif
+#endif
 }
 
 TEST_CASE("space flag - non-standard format") {
@@ -111,15 +116,21 @@ TEST_CASE("space flag - non-standard format") {
 TEST_CASE("+ flag") {
   require_conform("+42",             "%+d", 42);
   require_conform("-42",             "%+d", -42);
-  require_conform("  +42",           "%+5d", 42);
-  require_conform("  -42",           "%+5d", -42);
-  require_conform("            +42", "%+15d", 42);
-  require_conform("            -42", "%+15d", -42);
   require_conform("+1024",           "%+d", 1024);
   require_conform("-1024",           "%+d", -1024);
   require_conform("+1024",           "%+i", 1024);
   require_conform("-1024",           "%+i", -1024);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+  require_conform("  +42",           "%+5d", 42);
+  require_conform("  -42",           "%+5d", -42);
+  require_conform("            +42", "%+15d", 42);
+  require_conform("            -42", "%+15d", -42);
+#endif
+
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
   require_conform("+",               "%+.0d", 0);
+#endif
 }
 
 TEST_CASE("+ flag - non-standard format") {
@@ -139,24 +150,33 @@ TEST_CASE("0 flag") {
   require_conform("42",              "%0d", 42);
   require_conform("42",              "%0ld", 42L);
   require_conform("-42",             "%0d", -42);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
   require_conform("00042",           "%05d", 42);
   require_conform("-0042",           "%05d", -42);
   require_conform("000000000000042", "%015d", 42);
   require_conform("-00000000000042", "%015d", -42);
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
   require_conform("000000000042.12", "%015.2f", 42.1234);
   require_conform("00000000042.987", "%015.3f", 42.9876);
   require_conform("-00000042.98759", "%015.5f", -42.9876);
+#endif
+#endif
 }
 
 TEST_CASE("- flag") {
   require_conform("42",              "%-d", 42);
   require_conform("-42",             "%-d", -42);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
   require_conform("42   ",           "%-5d", 42);
   require_conform("-42  ",           "%-5d", -42);
   require_conform("42             ", "%-15d", 42);
   require_conform("-42            ", "%-15d", -42);
+#endif
 }
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("- flag and non-standard 0 modifier for integers") {
   require_conform("42",              "%-0d", 42);
   require_conform("-42",             "%-0d", -42);
@@ -170,53 +190,65 @@ TEST_CASE("- flag and non-standard 0 modifier for integers") {
   require_conform("-42  ",           "%0-5d", -42);
   require_conform("42             ", "%0-15d", 42);
   require_conform("-42            ", "%0-15d", -42);
-
-#if 0
-  require_conform("-4.200e+01     ", "%0-15.3e", -42.);
-#endif
+  // require_conform("-4.200e+01     ", "%0-15.3e", -42.);
 }
+#endif
 
 TEST_CASE("# flag") {
   require_conform("0",          "%#o",          0);
-  require_conform("0",          "%#0o",         0);
-  require_conform("0",          "%#.0o",        0);
-  require_conform("0",          "%#.1o",        0);
-  require_conform("   0",       "%#4o",         0);
-  require_conform("0000",       "%#.4o",        0);
   require_conform("01",         "%#o",          1);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+  require_conform("0",          "%#0o",         0);
+  require_conform("   0",       "%#4o",         0);
   require_conform("01",         "%#0o",         1);
-  require_conform("01",         "%#.0o",        1);
-  require_conform("01",         "%#.1o",        1);
   require_conform("  01",       "%#4o",         1);
-  require_conform("0001",       "%#.4o",        1);
   require_conform("0x1001",     "%#04x",   0x1001);
   require_conform("01001",      "%#04o",    01001);
+#endif
+
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+  require_conform("0",          "%#.0o",        0);
+  require_conform("0",          "%#.1o",        0);
+  require_conform("0000",       "%#.4o",        0);
+  require_conform("01",         "%#.0o",        1);
+  require_conform("01",         "%#.1o",        1);
+  require_conform("0001",       "%#.4o",        1);
   require_conform("",           "%#.0x",        0);
   require_conform("0x0000614e", "%#.8x",   0x614e);
+#endif
 }
 
 TEST_CASE("# flag - non-standard format") {
 //  require_conform("0b110", "%#b", 6);
 }
 
+#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
 TEST_CASE("# flag with long-long") {
   require_conform("0",          "%#llo",   (long long)     0);
-  require_conform("0",          "%#0llo",  (long long)     0);
-  require_conform("0",          "%#.0llo", (long long)     0);
-  require_conform("0",          "%#.1llo", (long long)     0);
-  require_conform("   0",       "%#4llo",  (long long)     0);
-  require_conform("0000",       "%#.4llo", (long long)     0);
   require_conform("01",         "%#llo",   (long long)     1);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+  require_conform("0",          "%#0llo",  (long long)     0);
+  require_conform("   0",       "%#4llo",  (long long)     0);
   require_conform("01",         "%#0llo",  (long long)     1);
-  require_conform("01",         "%#.0llo", (long long)     1);
-  require_conform("01",         "%#.1llo", (long long)     1);
   require_conform("  01",       "%#4llo",  (long long)     1);
-  require_conform("0001",       "%#.4llo", (long long)     1);
   require_conform("0x1001",     "%#04llx", (long long)0x1001);
   require_conform("01001",      "%#04llo", (long long) 01001);
+#endif
+
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+  require_conform("0",          "%#.0llo", (long long)     0);
+  require_conform("0",          "%#.1llo", (long long)     0);
+  require_conform("0000",       "%#.4llo", (long long)     0);
+  require_conform("01",         "%#.0llo", (long long)     1);
+  require_conform("01",         "%#.1llo", (long long)     1);
+  require_conform("0001",       "%#.4llo", (long long)     1);
   require_conform("",           "%#.0llx", (long long)     0);
   require_conform("0x0000614e", "%#.8llx", (long long)0x614e);
+#endif
 }
+#endif
 
 TEST_CASE("# flag with long-long - non-standard format") {
 //  require_conform("0b110", "%#llb", (long long) 6);
@@ -241,6 +273,7 @@ TEST_CASE("specifier") {
   require_conform("%",           "%%");
 }
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("width") {
   require_conform("Hello testing", "%1s", "Hello testing");
   require_conform("1024",          "%1d", 1024);
@@ -257,7 +290,9 @@ TEST_CASE("width") {
   require_conform("EDCB5433",      "%1X", 3989525555U);
   require_conform("x",             "%1c", 'x');
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("width 20") {
   require_conform("               Hello", "%20s",   "Hello");
   require_conform("                1024", "%20d",   1024);
@@ -275,10 +310,14 @@ TEST_CASE("width 20") {
   require_conform("            EDCB5433", "%20X",   3989525555U);
   require_conform("                   0", "%20X",   0);
   require_conform("                   0", "%20X",   0U);
-  require_conform("                   0", "%20llX", 0ULL);
   require_conform("                   x", "%20c",   'x');
+#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
+  require_conform("                   0", "%20llX", 0ULL);
+#endif
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("width *20") {
   require_conform("               Hello", "%*s", 20, "Hello");
   require_conform("                1024", "%*d", 20, 1024);
@@ -295,7 +334,9 @@ TEST_CASE("width *20") {
   require_conform("            EDCB5433", "%*X", 20, 3989525555U);
   require_conform("                   x", "%*c", 20,'x');
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("width -20") {
   require_conform("Hello               ", "%-20s", "Hello");
   require_conform("1024                ", "%-20d", 1024);
@@ -317,7 +358,9 @@ TEST_CASE("width -20") {
   require_conform("|    9| |9           | |    9|", "|%5d| |%-12d| |%5d|", 9, 9, 9);
   require_conform("|   10| |10          | |   10|", "|%5d| |%-12d| |%5d|", 10, 10, 10);
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("width 0-20") {
   require_conform("Hello               ", "%0-20s", "Hello");
   require_conform("1024                ", "%0-20d", 1024);
@@ -334,7 +377,9 @@ TEST_CASE("width 0-20") {
   require_conform("EDCB5433            ", "%0-20X", 3989525555U);
   require_conform("x                   ", "%0-20c", 'x');
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding 20") {
   require_conform("00000000000000001024", "%020d", 1024);
   require_conform("-0000000000000001024", "%020d", -1024);
@@ -349,7 +394,9 @@ TEST_CASE("padding 20") {
   require_conform("0000000000001234ABCD", "%020X", 305441741);
   require_conform("000000000000EDCB5433", "%020X", 3989525555U);
 }
+#endif
 
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding .20") {
   require_conform("00000000000000001024",  "%.20d", 1024);
   require_conform("-00000000000000001024", "%.20d", -1024);
@@ -364,7 +411,9 @@ TEST_CASE("padding .20") {
   require_conform("0000000000001234ABCD",  "%.20X", 305441741);
   require_conform("000000000000EDCB5433",  "%.20X", 3989525555U);
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #020 - non-standard format") {
   require_conform("00000000000000001024", "%#020d", 1024);
   require_conform("-0000000000000001024", "%#020d", -1024);
@@ -373,7 +422,9 @@ TEST_CASE("padding #020 - non-standard format") {
   require_conform("00000000000000001024", "%#020u", 1024);
   require_conform("00000000004294966272", "%#020u", 4294966272U);
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #020") {
   require_conform("00000000000000000777", "%#020o", 511);
   require_conform("00000000037777777001", "%#020o", 4294966785U);
@@ -382,7 +433,9 @@ TEST_CASE("padding #020") {
   require_conform("0X00000000001234ABCD", "%#020X", 305441741);
   require_conform("0X0000000000EDCB5433", "%#020X", 3989525555U);
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #20 - non-standard format") {
   require_conform("                1024", "%#20d", 1024);
   require_conform("               -1024", "%#20d", -1024);
@@ -391,7 +444,9 @@ TEST_CASE("padding #20 - non-standard format") {
   require_conform("                1024", "%#20u", 1024);
   require_conform("          4294966272", "%#20u", 4294966272U);
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #20") {
   require_conform("                0777", "%#20o", 511);
   require_conform("        037777777001", "%#20o", 4294966785U);
@@ -400,7 +455,10 @@ TEST_CASE("padding #20") {
   require_conform("          0X1234ABCD", "%#20X", 305441741);
   require_conform("          0XEDCB5433", "%#20X", 3989525555U);
 }
+#endif
 
+#if (NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1)
 TEST_CASE("padding 20.5") {
   require_conform("               01024", "%20.5d", 1024);
   require_conform("              -01024", "%20.5d", -1024);
@@ -415,7 +473,9 @@ TEST_CASE("padding 20.5") {
   require_conform("            1234ABCD", "%20.5X", 305441741);
   require_conform("          00EDCB5433", "%20.10X", 3989525555U);
 }
+#endif
 
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding neg numbers") {
   // space padding
   require_conform("-5",   "% 1d", -5);
@@ -429,18 +489,14 @@ TEST_CASE("padding neg numbers") {
   require_conform("-05",  "%03d", -5);
   require_conform("-005", "%04d", -5);
 }
+#endif
 
+#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
 TEST_CASE("float padding neg numbers") {
   // space padding
   require_conform("-5.0",       "% 3.1f", -5.);
   require_conform("-5.0",       "% 4.1f", -5.);
   require_conform(" -5.0",      "% 5.1f", -5.);
-
-#if 0
-  require_conform("    -5",     "% 6.1g", -5.);
-  require_conform("-5.0e+00",   "% 6.1e", -5.);
-  require_conform("  -5.0e+00", "% 10.1e", -5.);
-#endif
 
   // zero padding
   require_conform("-5.0",       "%03.1f", -5.);
@@ -452,13 +508,17 @@ TEST_CASE("float padding neg numbers") {
   require_conform("-5",         "%02.0f", -5.);
   require_conform("-05",        "%03.0f", -5.);
 
-#if 0
-  require_conform("-005.0e+00", "%010.1e", -5.);
-  require_conform("-05E+00",    "%07.0E", -5.);
-  require_conform("-05",        "%03.0g", -5.);
-#endif
+  // require_conform("-005.0e+00", "%010.1e", -5.);
+  // require_conform("-05E+00",    "%07.0E", -5.);
+  // require_conform("-05",        "%03.0g", -5.);
+  // require_conform("    -5",     "% 6.1g", -5.);
+  // require_conform("-5.0e+00",   "% 6.1e", -5.);
+  // require_conform("  -5.0e+00", "% 10.1e", -5.);
 }
+#endif
 
+#if (NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1)
 TEST_CASE("length") {
   require_conform("",                     "%.0s", "Hello testing");
   require_conform("                    ", "%20.0s", "Hello testing");
@@ -485,21 +545,18 @@ TEST_CASE("length") {
   require_conform("            EDCB5433", "%20.0X", 3989525555U);
   require_conform("                    ", "%20.X", 0U);
 }
+#endif
 
+#if (NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1)
 TEST_CASE("length - non-standard format") {
   require_conform("  ", "%02.0u", 0U);
   require_conform("  ", "%02.0d", 0);
 }
-
-TEST_CASE("float") {
-  require_conform("     nan",  "%8f", (double)NAN);
-  require_conform("     inf",  "%8f", (double)INFINITY);
-  require_conform("-inf    ",  "%-8f", (double)-INFINITY);
-
-#if 0
-  require_conform("    +inf",  "%+8e", (double)INFINITY);
 #endif
 
+#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
+TEST_CASE("float") {
   require_conform("3.1415",    "%.4f", 3.1415354);
   require_conform("30343.140", "%.3f", 30343.1415354);
   require_conform("34",               "%.0f", 34.1415354);
@@ -510,11 +567,7 @@ TEST_CASE("float") {
   require_conform("42.895198820",     "%.9f", 42.8952);
   require_conform("42.8952217100",    "%.10f", 42.895223);
   require_conform("42.895221710000",  "%.12f", 42.89522312345678);
-  require_conform("42477.371093750000000", "%020.15f", 42477.37109375);
   require_conform("42.895225520000",  "%.12f", 42.89522387654321);
-  require_conform(" 42.89",           "%6.2f", 42.8952);
-  require_conform("+42.89",           "%+6.2f", 42.8952);
-  require_conform("+42.9",            "%+5.1f", 42.9252);
   require_conform("42.500000",        "%f", 42.5);
   require_conform("42.5",             "%.1f", 42.5);
   require_conform("42167.000000",     "%f", 42167.0);
@@ -524,84 +577,94 @@ TEST_CASE("float") {
   require_conform("4",                "%.0f", 4.5);
   require_conform("3",                "%.0f", 3.49);
   require_conform("3.4",              "%.1f", 3.49);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+  require_conform("     nan",  "%8f", (double)NAN);
+  require_conform("     inf",  "%8f", (double)INFINITY);
+  require_conform("-inf    ",  "%-8f", (double)-INFINITY);
+  require_conform("42477.371093750000000", "%020.15f", 42477.37109375);
+  require_conform(" 42.89",           "%6.2f", 42.8952);
+  require_conform("+42.89",           "%+6.2f", 42.8952);
+  require_conform("+42.9",            "%+5.1f", 42.9252);
   require_conform("a0.5  ",           "a%-5.1f", 0.5);
   require_conform("a0.5  end",        "a%-5.1fend", 0.5);
+#endif
 
-#if 0
   // switch from decimal to exponential representation
   //
-  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 ) );
-  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 3) {
-    CHECK(!strcmp(buffer, "1e+3"));
-  }
-  else {
-    CHECK(!strcmp(buffer, "1000"));
-  }
-
-  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 ) );
-  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 6) {
-    CHECK(!strcmp(buffer, "1e+6"));
-  }
-  else {
-    CHECK(!strcmp(buffer, "1000000"));
-  }
-
-  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 * 1000 ) );
-  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 9) {
-    CHECK(!strcmp(buffer, "1e+9"));
-  }
-  else {
-    CHECK(!strcmp(buffer, "1000000000"));
-  }
-
-  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 * 1000 * 1000) );
-  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 12) {
-#if PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS
-    CHECK(!strcmp(buffer, "1e+12"));
-#else
-    CHECK(!strcmp(buffer, ""));
-#endif
-  }
-  else {
-    CHECK(!strcmp(buffer, "1000000000000"));
-  }
-
-  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 * 1000 * 1000 * 1000) );
-  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 15) {
-#if PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS
-    CHECK(!strcmp(buffer, "1e+15"));
-#else
-    CHECK(!strcmp(buffer, ""));
-#endif
-  }
-  else {
-    CHECK(!strcmp(buffer, "1000000000000000"));
-  }
-
-  PRINTING_CHECK("0.5",              "%.4g", 0.5);
-  PRINTING_CHECK("1",                "%.4g", 1.0);
-  PRINTING_CHECK("12345.7",          "%G", 12345.678);
-  PRINTING_CHECK("12345.68",         "%.7G", 12345.678);
-  PRINTING_CHECK("1.2346E+08",       "%.5G", 123456789.);
-  PRINTING_CHECK("12345",            "%.6G", 12345.);
-  PRINTING_CHECK("  +1.235e+08",     "%+12.4g", 123456789.);
-  PRINTING_CHECK("0.0012",           "%.2G", 0.001234);
-  PRINTING_CHECK(" +0.001234",       "%+10.4G", 0.001234);
-  PRINTING_CHECK("+001.234e-05",     "%+012.4g", 0.00001234);
-  PRINTING_CHECK("-1.23e-308",       "%.3g", -1.2345e-308);
-  PRINTING_CHECK("+1.230E+308",      "%+.3E", 1.23e+308);
-  PRINTING_CHECK("1.000e+01",        "%.3e", 9.9996);
-  PRINTING_CHECK("0",                "%g", 0.);
-  PRINTING_CHECK("-0",               "%g", -0.);
-  PRINTING_CHECK("+0",               "%+g", 0.);
-  PRINTING_CHECK("-0",               "%+g", -0.);
-  PRINTING_CHECK("-4e+04",           "%.1g", -40661.5);
-  PRINTING_CHECK("-4.e+04",          "%#.1g", -40661.5);
-  PRINTING_CHECK("100.",             "%#.3g", 99.998580932617187500);
-  // Rounding-focused checks
-  PRINTING_CHECK("4.895512e+04",     "%e", 48955.125);
-  PRINTING_CHECK("9.2524e+04",       "%.4e", 92523.5);
-  PRINTING_CHECK("-8.380923438e+04", "%.9e", -83809.234375);
+//  require_conform("    +inf",  "%+8e", (double)INFINITY);
+//  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 ) );
+//  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 3) {
+//    CHECK(!strcmp(buffer, "1e+3"));
+//  }
+//  else {
+//    CHECK(!strcmp(buffer, "1000"));
+//  }
+//
+//  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 ) );
+//  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 6) {
+//    CHECK(!strcmp(buffer, "1e+6"));
+//  }
+//  else {
+//    CHECK(!strcmp(buffer, "1000000"));
+//  }
+//
+//  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 * 1000 ) );
+//  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 9) {
+//    CHECK(!strcmp(buffer, "1e+9"));
+//  }
+//  else {
+//    CHECK(!strcmp(buffer, "1000000000"));
+//  }
+//
+//  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 * 1000 * 1000) );
+//  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 12) {
+//#if PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS
+//    CHECK(!strcmp(buffer, "1e+12"));
+//#else
+//    CHECK(!strcmp(buffer, ""));
+//#endif
+//  }
+//  else {
+//    CHECK(!strcmp(buffer, "1000000000000"));
+//  }
+//
+//  CAPTURE_AND_PRINT(test::sprintf_, buffer, "%.0f", (double) ((int64_t)1 * 1000 * 1000 * 1000 * 1000 * 1000) );
+//  if (PRINTF_MAX_INTEGRAL_DIGITS_FOR_DECIMAL < 15) {
+//#if PRINTF_SUPPORT_EXPONENTIAL_SPECIFIERS
+//    CHECK(!strcmp(buffer, "1e+15"));
+//#else
+//    CHECK(!strcmp(buffer, ""));
+//#endif
+//  }
+//  else {
+//    CHECK(!strcmp(buffer, "1000000000000000"));
+//  }
+//
+//  PRINTING_CHECK("0.5",              "%.4g", 0.5);
+//  PRINTING_CHECK("1",                "%.4g", 1.0);
+//  PRINTING_CHECK("12345.7",          "%G", 12345.678);
+//  PRINTING_CHECK("12345.68",         "%.7G", 12345.678);
+//  PRINTING_CHECK("1.2346E+08",       "%.5G", 123456789.);
+//  PRINTING_CHECK("12345",            "%.6G", 12345.);
+//  PRINTING_CHECK("  +1.235e+08",     "%+12.4g", 123456789.);
+//  PRINTING_CHECK("0.0012",           "%.2G", 0.001234);
+//  PRINTING_CHECK(" +0.001234",       "%+10.4G", 0.001234);
+//  PRINTING_CHECK("+001.234e-05",     "%+012.4g", 0.00001234);
+//  PRINTING_CHECK("-1.23e-308",       "%.3g", -1.2345e-308);
+//  PRINTING_CHECK("+1.230E+308",      "%+.3E", 1.23e+308);
+//  PRINTING_CHECK("1.000e+01",        "%.3e", 9.9996);
+//  PRINTING_CHECK("0",                "%g", 0.);
+//  PRINTING_CHECK("-0",               "%g", -0.);
+//  PRINTING_CHECK("+0",               "%+g", 0.);
+//  PRINTING_CHECK("-0",               "%+g", -0.);
+//  PRINTING_CHECK("-4e+04",           "%.1g", -40661.5);
+//  PRINTING_CHECK("-4.e+04",          "%#.1g", -40661.5);
+//  PRINTING_CHECK("100.",             "%#.3g", 99.998580932617187500);
+//  // Rounding-focused checks
+//  PRINTING_CHECK("4.895512e+04",     "%e", 48955.125);
+//  PRINTING_CHECK("9.2524e+04",       "%.4e", 92523.5);
+//  PRINTING_CHECK("-8.380923438e+04", "%.9e", -83809.234375);
 
   // out of range for float: should switch to exp notation if supported, else empty
 // #if PRINTF_SUPPORT_DECIMAL_SPECIFIERS
@@ -612,8 +675,8 @@ TEST_CASE("float") {
 //   CHECK(!strcmp(buffer, ""));
 // #endif
 // #endif
-#endif
 }
+#endif
 
 TEST_CASE("types") {
   require_conform("0",                    "%i", 0);
@@ -623,20 +686,11 @@ TEST_CASE("types") {
   require_conform("30",                   "%li", 30L);
   require_conform("-2147483647",          "%li", -2147483647L);
   require_conform("2147483647",           "%li", 2147483647L);
-  require_conform("30",                   "%lli", 30LL);
-  require_conform("-9223372036854775807", "%lli", -9223372036854775807LL);
-  require_conform("9223372036854775807",  "%lli", 9223372036854775807LL);
   require_conform("100000",               "%lu", 100000L);
   require_conform("4294967295",           "%lu", 0xFFFFFFFFL);
-  require_conform("281474976710656",      "%llu", 281474976710656LLU);
-  require_conform("18446744073709551615", "%llu", 18446744073709551615LLU);
-  require_conform("2147483647",           "%zu", (size_t)2147483647UL);
-  require_conform("2147483647",           "%zd", (size_t)2147483647UL);
-  require_conform("-2147483647",          "%zi", (ssize_t)-2147483647L);
   require_conform("165140",               "%o", 60000);
   require_conform("57060516",             "%lo", 12345678L);
   require_conform("12345678",             "%lx", 0x12345678L);
-  require_conform("1234567891234567",     "%llx", 0x1234567891234567LLU);
   require_conform("abcdefab",             "%lx", 0xabcdefabL);
   require_conform("ABCDEFAB",             "%lX", 0xabcdefabL);
   require_conform("v",                    "%c", 'v');
@@ -645,11 +699,27 @@ TEST_CASE("types") {
   require_conform("255",                  "%hhu", (unsigned char) 0xFFU);
   require_conform("4660",                 "%hu", (unsigned short) 0x1234u);
   require_conform("Test100 65535",        "%s%hhi %hu", "Test", (char) 100, (unsigned short) 0xFFFF);
+
+#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
+  require_conform("2147483647",           "%zu", (size_t)2147483647UL);
+  require_conform("2147483647",           "%zd", (size_t)2147483647UL);
+  require_conform("-2147483647",          "%zi", (ssize_t)-2147483647L);
+
   {
     char buffer[11];
     require_conform("a",                    "%tx", &buffer[10] - &buffer[0]);
   }
+#endif
+
+#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
+  require_conform("30",                   "%lli", 30LL);
+  require_conform("-9223372036854775807", "%lli", -9223372036854775807LL);
+  require_conform("9223372036854775807",  "%lli", 9223372036854775807LL);
+  require_conform("281474976710656",      "%llu", 281474976710656LLU);
+  require_conform("18446744073709551615", "%llu", 18446744073709551615LLU);
   require_conform("-2147483647",          "%ji", (intmax_t)-2147483647L);
+  require_conform("1234567891234567",     "%llx", 0x1234567891234567LLU);
+#endif
 }
 
 TEST_CASE("types - non-standard format") {
@@ -670,12 +740,14 @@ TEST_CASE("unknown flag (non-standard format)") {
 }
 
 TEST_CASE("string length") {
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
   require_conform("This", "%.4s", "This is a test");
   require_conform("test", "%.4s", "test");
   require_conform("123", "%.7s", "123");
   require_conform("", "%.7s", "");
   require_conform("1234ab", "%.4s%.2s", "123456", "abcdef");
   require_conform("123", "%.*s", 3, "123456");
+#endif
   // require_conform("(null)", "%.*s", 3, (const char*) NULL);
 }
 
@@ -686,14 +758,25 @@ TEST_CASE("string length (non-standard format)") {
 
 TEST_CASE("misc") {
   require_conform("53000atest-20 bit",    "%u%u%ctest%d %s", 5, 3000, 'a', -20, "bit");
-  require_conform("0.33",                 "%.*f", 2, 0.33333333);
-  require_conform("1",                    "%.*d", -1, 1);
-  require_conform("foo",                  "%.3s", "foobar");
-  require_conform(" ",                    "% .0d", 0);
-  require_conform("     00004",           "%10.5d", 4);
+
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
   require_conform("hi x",                 "%*sx", -3, "hi");
+#endif
+
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+  require_conform("1",                    "%.*d", -1, 1);
+  require_conform(" ",                    "% .0d", 0);
+  require_conform("foo",                  "%.3s", "foobar");
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+  require_conform("     00004",           "%10.5d", 4);
   require_conform("00123               ", "%-20.5i", 123);
+#endif
+#endif
+
+#if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
   require_conform("-67224.546875000000000000", "%.18f", -67224.546875);
+  require_conform("0.33",                 "%.*f", 2, 0.33333333);
+#endif
 
 #if 0
   require_conform("0.33",              "%.*g", 2, 0.33333333);
@@ -710,8 +793,10 @@ TEST_CASE("extremal signed integer values") {
   require_conform(nullptr, "%d", std::numeric_limits<int>::max());
   require_conform(nullptr, "%ld", std::numeric_limits<long int>::min());
   require_conform(nullptr, "%ld", std::numeric_limits<long int>::max());
+#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
   require_conform(nullptr, "%lld", std::numeric_limits<long long int>::min());
   require_conform(nullptr, "%lld", std::numeric_limits<long long int>::max());
+#endif
 }
 
 TEST_CASE("extremal unsigned integer values") {
@@ -719,5 +804,7 @@ TEST_CASE("extremal unsigned integer values") {
   require_conform(nullptr, "%hu", std::numeric_limits<short unsigned>::max());
   require_conform(nullptr, "%u", std::numeric_limits<unsigned>::max());
   require_conform(nullptr, "%lu", std::numeric_limits<long unsigned>::max());
+#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
   require_conform(nullptr, "%llu", std::numeric_limits<long long unsigned>::max());
+#endif
 }
