@@ -717,10 +717,12 @@ TEST_CASE("types") {
 #endif
 }
 
+#if NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1
 TEST_CASE("types - non-standard format") {
-  // require_conform("1110101001100000", "%b", 60000);
-  // require_conform("101111000110000101001110", "%lb", 12345678L);
+  require_conform("1110101001100000", "%b", 60000);
+  require_conform("101111000110000101001110", "%lb", 12345678L);
 }
+#endif
 
 TEST_CASE("pointer") { // mpaland pads to register width (non-standard), npf doesn't.
   require_conform("0x1234", "%p", (void *)0x1234u);
