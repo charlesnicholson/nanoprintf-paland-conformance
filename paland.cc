@@ -212,7 +212,9 @@ TEST_CASE("# flag") {
 }
 
 TEST_CASE("# flag - non-standard format") {
-//  require_conform("0b110", "%#b", 6);
+#if NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1
+  require_conform("0b110", "%#b", 6);
+#endif
 }
 
 #if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
@@ -243,7 +245,10 @@ TEST_CASE("# flag with long-long") {
 #endif
 
 TEST_CASE("# flag with long-long - non-standard format") {
-//  require_conform("0b110", "%#llb", (long long) 6);
+#if (NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1)
+  require_conform("0b110", "%#llb", (long long) 6);
+#endif
 }
 
 TEST_CASE("specifier") {
