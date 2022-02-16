@@ -49,6 +49,7 @@
     #pragma GCC diagnostic ignored "-Wformat-pedantic"
     #pragma GCC diagnostic ignored "-Wformat-nonliteral"
     #pragma GCC diagnostic ignored "-Wold-style-cast"
+    #pragma GCC diagnostic ignored "-Wpadded"
   #endif
   #pragma GCC diagnostic ignored "-Wformat"
   #pragma GCC diagnostic ignored "-Wformat-zero-length"
