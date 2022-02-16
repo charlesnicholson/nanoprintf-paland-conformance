@@ -48,7 +48,9 @@
     #pragma GCC diagnostic ignored "-Wformat-nonliteral"
     #pragma GCC diagnostic ignored "-Wold-style-cast"
     #pragma GCC diagnostic ignored "-Wpadded"
-    #pragma GCC diagnostic ignored "-Wreserved-identifier"
+    #ifndef __APPLE__
+      #pragma GCC diagnostic ignored "-Wreserved-identifier"
+    #endif
   #endif
   #pragma GCC diagnostic ignored "-Wformat"
   #pragma GCC diagnostic ignored "-Wformat-zero-length"
