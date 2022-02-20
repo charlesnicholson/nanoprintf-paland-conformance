@@ -39,6 +39,7 @@
 #ifdef _MSC_VER
   #pragma warning(disable:4464) // relative include uses ..
   #pragma warning(disable:4514) // unreferenced inline function removed
+  #pragma warning(disable:4820) // padding after data member
 #endif
 
 // The configuration flags are injected by CMakeLists.txt in the npf project.
