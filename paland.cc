@@ -29,8 +29,6 @@
 // Rewritten for nanoprintf by Charles Nicholson (charles.nicholson@gmail.com)
 // A derivative work of Paland's original, so released under the MIT License.
 
-#include "../doctest.h"
-
 #include <string.h>
 #include <math.h>
 #include <limits>
@@ -46,8 +44,18 @@
   #pragma GCC diagnostic push
   #if NANOPRINTF_CLANG
     #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
+    #ifndef __APPLE__
+      #pragma GCC diagnostic ignored "-Wreserved-identifier"
+    #endif
+  #endif
+#endif
+
+#include "../doctest.h"
+
+#if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
+  #pragma GCC diagnostic push
+  #if NANOPRINTF_CLANG
     #pragma GCC diagnostic ignored "-Wformat-pedantic"
-    #pragma GCC diagnostic ignored "-Wreserved-identifier"
   #endif
   #pragma GCC diagnostic ignored "-Wold-style-cast"
   #pragma GCC diagnostic ignored "-Wpadded"
