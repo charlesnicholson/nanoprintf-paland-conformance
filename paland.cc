@@ -36,6 +36,11 @@
 #include <iostream>
 #include <sstream>
 
+#ifdef _MSC_VER
+  #pragma warning(disable:4464) // relative include uses ..
+  #pragma warning(disable:4514) // unreferenced inline function removed
+#endif
+
 // The configuration flags are injected by CMakeLists.txt in the npf project.
 #define NANOPRINTF_IMPLEMENTATION
 #include "../../nanoprintf.h"
@@ -47,10 +52,6 @@
       #pragma GCC diagnostic ignored "-Wreserved-identifier"
     #endif
   #endif
-#endif
-
-#ifdef _MSC_VER
-  #pragma warning(disable:4514) // unreferenced inline function removed
 #endif
 
 #include "../doctest.h"
