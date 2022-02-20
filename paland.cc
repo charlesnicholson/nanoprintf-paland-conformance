@@ -29,18 +29,20 @@
 // Rewritten for nanoprintf by Charles Nicholson (charles.nicholson@gmail.com)
 // A derivative work of Paland's original, so released under the MIT License.
 
+#ifdef _MSC_VER
+  #pragma warning(disable:4464) // relative include uses ..
+  #pragma warning(disable:4514) // unreferenced inline function removed
+  #pragma warning(disable:4820) // padding after data member
+  #pragma warning(disable:4710) // function not inlined
+  #pragma warning(disable:4711) // selected for inline
+#endif
+
 #include <string.h>
 #include <math.h>
 #include <limits>
 #include <string>
 #include <iostream>
 #include <sstream>
-
-#ifdef _MSC_VER
-  #pragma warning(disable:4464) // relative include uses ..
-  #pragma warning(disable:4514) // unreferenced inline function removed
-  #pragma warning(disable:4820) // padding after data member
-#endif
 
 // The configuration flags are injected by CMakeLists.txt in the npf project.
 #define NANOPRINTF_IMPLEMENTATION
