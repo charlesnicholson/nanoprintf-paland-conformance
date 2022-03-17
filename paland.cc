@@ -41,7 +41,6 @@
 #include <math.h>
 #include <limits>
 #include <string>
-#include <iostream>
 #include <sstream>
 
 // The configuration flags are injected by CMakeLists.txt in the npf project.
@@ -57,6 +56,7 @@
   #endif
 #endif
 
+#define DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
 #include "../doctest.h"
 
 #if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
