@@ -56,7 +56,6 @@
   #endif
 #endif
 
-#define DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
 #include "../doctest.h"
 
 #if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
