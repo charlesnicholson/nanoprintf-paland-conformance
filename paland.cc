@@ -29,28 +29,45 @@
 // Rewritten for nanoprintf by Charles Nicholson (charles.nicholson@gmail.com)
 // A derivative work of Paland's original, so released under the MIT License.
 
-#include "../doctest.h"
+#ifdef _MSC_VER
+  #pragma warning(disable:4464) // relative include uses ..
+  #pragma warning(disable:4514) // unreferenced inline function removed
+  #pragma warning(disable:4820) // padding after data member
+  #pragma warning(disable:4710) // function not inlined
+  #pragma warning(disable:4711) // selected for inline
+#endif
 
 #include <string.h>
 #include <math.h>
 #include <limits>
 #include <string>
-#include <iostream>
 #include <sstream>
 
 // The configuration flags are injected by CMakeLists.txt in the npf project.
 #define NANOPRINTF_IMPLEMENTATION
 #include "../../nanoprintf.h"
 
-#if NANOPRINTF_CLANG_OR_GCC_PAST_4_6
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
+#if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
+  #if NANOPRINTF_CLANG
+    #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
+    #ifndef __APPLE__
+      #pragma GCC diagnostic ignored "-Wreserved-identifier"
+    #endif
+  #endif
+#endif
+
+#define DOCTEST_CONFIG_NO_TRY_CATCH_IN_ASSERTS
+#include "../doctest.h"
+
+#if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
+  #if NANOPRINTF_CLANG
+    #pragma GCC diagnostic ignored "-Wformat-pedantic"
+  #endif
   #pragma GCC diagnostic ignored "-Wold-style-cast"
   #pragma GCC diagnostic ignored "-Wpadded"
   #pragma GCC diagnostic ignored "-Wformat"
   #pragma GCC diagnostic ignored "-Wformat-nonliteral"
   #pragma GCC diagnostic ignored "-Wformat-security"
-  #pragma GCC diagnostic ignored "-Wformat-pedantic"
 #endif
 
 namespace {
