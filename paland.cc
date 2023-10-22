@@ -63,6 +63,7 @@
 #if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
   #if NANOPRINTF_CLANG
     #pragma GCC diagnostic ignored "-Wformat-pedantic"
+    #pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
   #endif
   #pragma GCC diagnostic ignored "-Wold-style-cast"
   #pragma GCC diagnostic ignored "-Wpadded"
