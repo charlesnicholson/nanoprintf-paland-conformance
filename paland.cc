@@ -54,6 +54,7 @@
     #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
     #ifndef __APPLE__
       #pragma GCC diagnostic ignored "-Wreserved-identifier"
+      #pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
     #endif
   #endif
 #endif
@@ -63,7 +64,6 @@
 #if NANOPRINTF_HAVE_GCC_WARNING_PRAGMAS
   #if NANOPRINTF_CLANG
     #pragma GCC diagnostic ignored "-Wformat-pedantic"
-    #pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
   #endif
   #pragma GCC diagnostic ignored "-Wold-style-cast"
   #pragma GCC diagnostic ignored "-Wpadded"
