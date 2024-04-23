@@ -588,21 +588,21 @@ TEST_CASE("length - non-standard format") {
 
 #if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
 TEST_CASE("float") {
-  require_conform("3.1415",    "%.4f", 3.1415354);
-  require_conform("30343.141", "%.3f", 30343.1415354);
+  require_conform("3.1415",           "%.4f", 3.1415354);
+  require_conform("30343.142",        "%.3f", 30343.1415354);
   require_conform("34",               "%.0f", 34.1415354);
   require_conform("1",                "%.0f", 1.3);
   require_conform("2",                "%.0f", 1.55);
   require_conform("1.6",              "%.1f", 1.64);
   require_conform("42.90",            "%.2f", 42.8952);
-  require_conform("42.895198822",     "%.9f", 42.8952);
-  require_conform("42.8952217100",    "%.10f", 42.895223);
-  require_conform("42.895221710000",  "%.12f", 42.89522312345678);
-  require_conform("42.895225524000",  "%.12f", 42.89522387654321);
+  require_conform("42.895199999",     "%.9f", 42.8952);
+  require_conform("42.8952229992",    "%.10f", 42.895223);
+  require_conform("42.895223123208",  "%.12f", 42.89522312345678);
+  require_conform("42.895223876461",  "%.12f", 42.89522387654321);
   require_conform("42.500000",        "%f", 42.5);
   require_conform("42.5",             "%.1f", 42.5);
   require_conform("42167.000000",     "%f", 42167.0);
-  require_conform("-12345.987304687", "%.9f", -12345.987654321);
+  require_conform("-12345.987654321", "%.9f", -12345.987654321);
   require_conform("4.0",              "%.1f", 3.999);
   require_conform("4",                "%.0f", 3.5);
   require_conform("5",                "%.0f", 4.5);
@@ -807,7 +807,7 @@ TEST_CASE("misc") {
 #endif
 
 #if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
-  require_conform("-67224.546875000000000000", "%.18f", -67224.546875);
+  require_conform("-67224.54687500000000000", "%.17f", -67224.546875);
   require_conform("0.33",                 "%.*f", 2, 0.33333333);
 #endif
 
