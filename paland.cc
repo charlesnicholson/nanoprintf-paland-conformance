@@ -733,7 +733,7 @@ TEST_CASE("types") {
 #if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
   require_conform("2147483647",           "%zu", (size_t)2147483647UL);
   require_conform("2147483647",           "%zd", (size_t)2147483647UL);
-  require_conform("-2147483647",          "%zi", (ssize_t)-2147483647L);
+  require_conform("-2147483647",          "%zi", (npf_ssize_t)-2147483647L);
 
   {
     char buffer[11];
