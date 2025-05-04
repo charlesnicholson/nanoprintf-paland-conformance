@@ -757,12 +757,12 @@ TEST_CASE("types - non-standard format") {
 }
 #endif
 
-TEST_CASE("pointer") { // mpaland pads to register width (non-standard), npf doesn't.
-  require_conform("0x1234", "%p", (void *)0x1234u);
-  require_conform("0x12345678", "%p", (void *)0x12345678u);
+TEST_CASE("pointer") { // mpaland pads to reg width (non-standard), npf doesn't add 0x.
+  require_conform("1234", "%p", (void *)0x1234u);
+  require_conform("12345678", "%p", (void *)0x12345678u);
   require_conform(
-    "0x12345678-0x7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
-  require_conform("0xffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+    "12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+  require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
 }
 
 TEST_CASE("unknown flag (non-standard format)") {
