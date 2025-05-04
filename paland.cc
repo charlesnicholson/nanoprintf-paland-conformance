@@ -216,6 +216,7 @@ TEST_CASE("- flag and non-standard 0 modifier for integers") {
 }
 #endif
 
+#if NANOPRINTF_USE_ALT_FORM_FLAG == 1
 TEST_CASE("# flag") {
   require_conform("0",          "%#o",          0);
   require_conform("01",         "%#o",          1);
@@ -240,14 +241,15 @@ TEST_CASE("# flag") {
   require_conform("0x0000614e", "%#.8x",   0x614e);
 #endif
 }
+#endif
 
 TEST_CASE("# flag - non-standard format") {
-#if NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1
+#if (NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1) && (NANOPRINTF_USE_ALT_FORM_FLAG == 1)
   require_conform("0b110", "%#b", 6);
 #endif
 }
 
-#if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
+#if (NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1) && (NANOPRINTF_USE_ALT_FORM_FLAG == 1)
 TEST_CASE("# flag with long-long") {
   require_conform("0",          "%#llo",   (long long)     0);
   require_conform("01",         "%#llo",   (long long)     1);
@@ -276,7 +278,8 @@ TEST_CASE("# flag with long-long") {
 
 TEST_CASE("# flag with long-long - non-standard format") {
 #if (NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1) && \
-    (NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1)
+    (NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_ALT_FORM_FLAG == 1)
   require_conform("0b110", "%#llb", (long long) 6);
 #endif
 }
@@ -443,7 +446,8 @@ TEST_CASE("padding .20") {
 }
 #endif
 
-#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+#if (NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1) && \
+    (NANOPRINTF_USE_ALT_FORM_FLAG == 1)
 TEST_CASE("padding #020 - non-standard format") {
   require_conform("00000000000000001024", "%#020d", 1024);
   require_conform("-0000000000000001024", "%#020d", -1024);
@@ -452,9 +456,7 @@ TEST_CASE("padding #020 - non-standard format") {
   require_conform("00000000000000001024", "%#020u", 1024);
   require_conform("00000000004294966272", "%#020u", 4294966272U);
 }
-#endif
 
-#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #020") {
   require_conform("00000000000000000777", "%#020o", 511);
   require_conform("00000000037777777001", "%#020o", 4294966785U);
@@ -463,9 +465,7 @@ TEST_CASE("padding #020") {
   require_conform("0X00000000001234ABCD", "%#020X", 305441741);
   require_conform("0X0000000000EDCB5433", "%#020X", 3989525555U);
 }
-#endif
 
-#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #20 - non-standard format") {
   require_conform("                1024", "%#20d", 1024);
   require_conform("               -1024", "%#20d", -1024);
@@ -474,9 +474,7 @@ TEST_CASE("padding #20 - non-standard format") {
   require_conform("                1024", "%#20u", 1024);
   require_conform("          4294966272", "%#20u", 4294966272U);
 }
-#endif
 
-#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
 TEST_CASE("padding #20") {
   require_conform("                0777", "%#20o", 511);
   require_conform("        037777777001", "%#20o", 4294966785U);
