@@ -724,9 +724,11 @@ TEST_CASE("types") {
   require_conform("v",                    "%c", 'v');
   require_conform("wv",                   "%cv", 'w');
   require_conform("A Test",               "%s", "A Test");
+#if NANOPRINTF_USE_SMALL_FORMAT_SPECIFIERS == 1
   require_conform("255",                  "%hhu", (unsigned char) 0xFFU);
   require_conform("4660",                 "%hu", (unsigned short) 0x1234u);
   require_conform("Test100 65535",        "%s%hhi %hu", "Test", (char) 100, (unsigned short) 0xFFFF);
+#endif
 
 #if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
   require_conform("2147483647",           "%zu", (size_t)2147483647UL);
@@ -818,8 +820,10 @@ TEST_CASE("misc") {
 }
 
 TEST_CASE("extremal signed integer values") {
+#if NANOPRINTF_USE_SMALL_FORMAT_SPECIFIERS == 1
   require_conform(nullptr, "%hhd", std::numeric_limits<char>::max());
   require_conform(nullptr, "%hd", std::numeric_limits<short int>::max());
+#endif
   require_conform(nullptr, "%d", std::numeric_limits<int>::min());
   require_conform(nullptr, "%d", std::numeric_limits<int>::max());
   require_conform(nullptr, "%ld", std::numeric_limits<long int>::min());
@@ -831,8 +835,10 @@ TEST_CASE("extremal signed integer values") {
 }
 
 TEST_CASE("extremal unsigned integer values") {
+#if NANOPRINTF_USE_SMALL_FORMAT_SPECIFIERS == 1
   require_conform(nullptr, "%hhu", std::numeric_limits<char unsigned>::max());
   require_conform(nullptr, "%hu", std::numeric_limits<short unsigned>::max());
+#endif
   require_conform(nullptr, "%u", std::numeric_limits<unsigned>::max());
   require_conform(nullptr, "%lu", std::numeric_limits<long unsigned>::max());
 #if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
