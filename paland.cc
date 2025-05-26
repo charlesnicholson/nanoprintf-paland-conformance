@@ -760,7 +760,7 @@ TEST_CASE("types - non-standard format") {
 #endif
 
 TEST_CASE("pointer") { // everything is IB
-  if(sizeof(void *) == 8) {
+  if constexpr (sizeof(void *) == 8) {
 #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
     require_conform("0000000000000000", "%p", nullptr);
     require_conform("0000000000000012", "%p", (void *)0x12u);
