@@ -759,12 +759,180 @@ TEST_CASE("types - non-standard format") {
 }
 #endif
 
-TEST_CASE("pointer") { // mpaland pads to reg width (non-standard), npf doesn't add 0x.
-  require_conform("1234", "%p", (void *)0x1234u);
-  require_conform("12345678", "%p", (void *)0x12345678u);
-  require_conform(
-    "12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
-  require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+TEST_CASE("pointer") { // everything is IB
+  if(sizeof(void *) == 8) {
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+    require_conform("0000000000000000", "%p", nullptr);
+    require_conform("0000000000000012", "%p", (void *)0x12u);
+    require_conform("0000000000001234", "%p", (void *)0x1234u);
+    require_conform("0000000012345678", "%p", (void *)0x12345678u);
+    require_conform("0000000012345678-000000007edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+    require_conform("00000000ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("abcdef0123456789", "%p", (void *)(uintptr_t)0xabcdef0123456789llu);
+    require_conform("", "%.0p", nullptr);
+    require_conform("0", "%.1p", nullptr);
+    require_conform("0000000012", "%.10p", (void *)0x12u);
+    require_conform("0000001234", "%.10p", (void *)0x1234u);
+    require_conform("0012345678", "%.10p", (void *)0x12345678u);
+    require_conform("00ffffffff", "%.10p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("abcdef0123456789", "%.10p", (void *)(uintptr_t)0xabcdef0123456789llu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("0000000000000000", "%#p", nullptr);
+    require_conform("0x0000000000000012", "%#p", (void *)0x12u);
+    require_conform("0x0000000000001234", "%#p", (void *)0x1234u);
+    require_conform("0x0000000012345678", "%#p", (void *)0x12345678u);
+    require_conform("0x00000000ffffffff", "%#p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("0xabcdef0123456789", "%#p", (void *)(uintptr_t)0xabcdef0123456789llu);
+  #endif
+#else
+    require_conform("0", "%p", nullptr);
+    require_conform("12", "%p", (void *)0x12u);
+    require_conform("1234", "%p", (void *)0x1234u);
+    require_conform("12345678", "%p", (void *)0x12345678u);
+    require_conform("12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+    require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("abcdef0123456789", "%p", (void *)(uintptr_t)0xabcdef0123456789llu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("0", "%#p", nullptr);
+    require_conform("0x12", "%#p", (void *)0x12u);
+    require_conform("0x1234", "%#p", (void *)0x1234u);
+    require_conform("0x12345678", "%#p", (void *)0x12345678u);
+    require_conform("0xffffffff", "%#p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("0xabcdef0123456789", "%#p", (void *)(uintptr_t)0xabcdef0123456789llu);
+  #endif
+#endif
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+    require_conform("00000000000000000000", "%020p", nullptr);
+    require_conform("00000000000000000012", "%020p", (void *)0x12u);
+    require_conform("00000000000000001234", "%020p", (void *)0x1234u);
+    require_conform("00000000000012345678", "%020p", (void *)0x12345678u);
+    require_conform("000000000000ffffffff", "%020p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("0000abcdef0123456789", "%020p", (void *)(uintptr_t)0xabcdef0123456789llu);
+  #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+    require_conform("    0000000000000000", "%20p", nullptr);
+    require_conform("    0000000000000012", "%20p", (void *)0x12u);
+    require_conform("    abcdef0123456789", "%20p", (void *)(uintptr_t)0xabcdef0123456789llu);
+    require_conform("0000000000000000    ", "%-20p", nullptr);
+    require_conform("0000000000000012    ", "%-20p", (void *)0x12u);
+    require_conform("abcdef0123456789    ", "%-20p", (void *)(uintptr_t)0xabcdef0123456789llu);
+    require_conform("                   0", "%20.1p", nullptr);
+    require_conform("0                   ", "%-20.1p", nullptr);
+    require_conform("       012", "%10.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0000000012", "%010.3p", (void *)(uintptr_t)0x12llu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("     0x012", "%#10.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0x00000012", "%#010.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0x012     ", "%#-10.3p", (void *)(uintptr_t)0x12llu);
+  #endif
+  #endif
+#endif
+  } else if(sizeof(void *) == 4) {
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+    require_conform("00000000", "%p", nullptr);
+    require_conform("00000012", "%p", (void *)0x12u);
+    require_conform("00001234", "%p", (void *)0x1234u);
+    require_conform("12345678", "%p", (void *)0x12345678u);
+    require_conform("12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+    require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+    require_conform("", "%.0p", nullptr);
+    require_conform("0", "%.1p", nullptr);
+    require_conform("0000000012", "%.10p", (void *)0x12u);
+    require_conform("0000001234", "%.10p", (void *)0x1234u);
+    require_conform("0012345678", "%.10p", (void *)0x12345678u);
+    require_conform("00ffffffff", "%.10p", (void *)(uintptr_t)0xffffffffu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("00000000", "%#p", nullptr);
+    require_conform("0x00000012", "%#p", (void *)0x12u);
+    require_conform("0x00001234", "%#p", (void *)0x1234u);
+    require_conform("0x12345678", "%#p", (void *)0x12345678u);
+    require_conform("0xffffffff", "%#p", (void *)(uintptr_t)0xffffffffu);
+  #endif
+#else
+    require_conform("0", "%p", nullptr);
+    require_conform("12", "%p", (void *)0x12u);
+    require_conform("1234", "%p", (void *)0x1234u);
+    require_conform("12345678", "%p", (void *)0x12345678u);
+    require_conform("12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+    require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("0", "%#p", nullptr);
+    require_conform("0x12", "%#p", (void *)0x12u);
+    require_conform("0x1234", "%#p", (void *)0x1234u);
+    require_conform("0x12345678", "%#p", (void *)0x12345678u);
+    require_conform("0xffffffff", "%#p", (void *)(uintptr_t)0xffffffffu);
+  #endif
+#endif
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+    require_conform("0000000000", "%010p", nullptr);
+    require_conform("0000000012", "%010p", (void *)0x12u);
+    require_conform("0000001234", "%010p", (void *)0x1234u);
+    require_conform("0012345678", "%010p", (void *)0x12345678u);
+    require_conform("00ffffffff", "%010p", (void *)(uintptr_t)0xffffffffu);
+  #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+    require_conform("            00000000", "%20p", nullptr);
+    require_conform("            00000012", "%20p", (void *)0x12u);
+    require_conform("            23456789", "%20p", (void *)(uintptr_t)0x23456789llu);
+    require_conform("00000000            ", "%-20p", nullptr);
+    require_conform("00000012            ", "%-20p", (void *)0x12u);
+    require_conform("23456789            ", "%-20p", (void *)(uintptr_t)0x23456789llu);
+    require_conform("                   0", "%20.1p", nullptr);
+    require_conform("0                   ", "%-20.1p", nullptr);
+    require_conform("       012", "%10.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0000000012", "%010.3p", (void *)(uintptr_t)0x12llu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("     0x012", "%#10.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0x00000012", "%#010.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0x012     ", "%#-10.3p", (void *)(uintptr_t)0x12llu);
+  #endif
+  #endif
+#endif
+  } else if(sizeof(void *) == 2) {
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+    require_conform("0000", "%p", nullptr);
+    require_conform("0012", "%p", (void *)0x12u);
+    require_conform("1234", "%p", (void *)0x1234u);
+    require_conform("", "%.0p", nullptr);
+    require_conform("0", "%.1p", nullptr);
+    require_conform("0000000012", "%.10p", (void *)0x12u);
+    require_conform("0000001234", "%.10p", (void *)0x1234u);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("0000", "%#p", nullptr);
+    require_conform("0x0012", "%#p", (void *)0x12u);
+    require_conform("0x1234", "%#p", (void *)0x1234u);
+  #endif
+#else
+    require_conform("0", "%p", nullptr);
+    require_conform("12", "%p", (void *)0x12u);
+    require_conform("1234", "%p", (void *)0x1234u);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("0", "%#p", nullptr);
+    require_conform("0x12", "%#p", (void *)0x12u);
+    require_conform("0x1234", "%#p", (void *)0x1234u);
+  #endif
+#endif
+#if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
+    require_conform("0000000000", "%010p", nullptr);
+    require_conform("0000000012", "%010p", (void *)0x12u);
+    require_conform("0000001234", "%010p", (void *)0x1234u);
+  #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+    require_conform("                0000", "%20p", nullptr);
+    require_conform("                0012", "%20p", (void *)0x12u);
+    require_conform("                6789", "%20p", (void *)(uintptr_t)0x6789llu);
+    require_conform("0000                ", "%-20p", nullptr);
+    require_conform("0012                ", "%-20p", (void *)0x12u);
+    require_conform("6789                ", "%-20p", (void *)(uintptr_t)0x6789llu);
+    require_conform("                   0", "%20.1p", nullptr);
+    require_conform("0                   ", "%-20.1p", nullptr);
+    require_conform("       012", "%10.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0000000012", "%010.3p", (void *)(uintptr_t)0x12llu);
+  #if NANOPRINTF_USE_ALT_FORM_FLAG == 1
+    require_conform("     0x012", "%#10.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0x00000012", "%#010.3p", (void *)(uintptr_t)0x12llu);
+    require_conform("0x012     ", "%#-10.3p", (void *)(uintptr_t)0x12llu);
+  #endif
+  #endif
+#endif
+  }
 }
 
 TEST_CASE("unknown flag (non-standard format)") {
