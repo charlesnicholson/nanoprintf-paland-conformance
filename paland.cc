@@ -37,6 +37,7 @@
   #pragma warning(disable:4711) // selected for inline
   #pragma warning(disable:5262) // nanoprintf case fallthrough
   #pragma warning(disable:5264) // const variable not used (shut up doctest)
+  #pragma warning(disable:4310) // cast truncates constant value
 #endif
 
 #include <string.h>
