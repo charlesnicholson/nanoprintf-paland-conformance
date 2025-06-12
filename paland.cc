@@ -826,7 +826,7 @@ TEST_CASE("pointer") { // everything is IB
   #endif
   #endif
 #endif
-  } else if(sizeof(void *) == 4) {
+  } else if constexpr(sizeof(void *) == 4) {
 #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
     require_conform("00000000", "%p", nullptr);
     require_conform("00000012", "%p", (void *)0x12u);
@@ -886,7 +886,7 @@ TEST_CASE("pointer") { // everything is IB
   #endif
   #endif
 #endif
-  } else if(sizeof(void *) == 2) {
+  } else if constexpr(sizeof(void *) == 2) {
 #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
     require_conform("0000", "%p", nullptr);
     require_conform("0012", "%p", (void *)0x12u);
