@@ -65,6 +65,7 @@
 #if NPF_HAVE_GCC_WARNING_PRAGMAS
   #if NPF_CLANG
     #pragma GCC diagnostic ignored "-Wformat-pedantic"
+    #pragma GCC diagnostic ignored "-Wunused-macros"
   #endif
   #pragma GCC diagnostic ignored "-Wold-style-cast"
   #pragma GCC diagnostic ignored "-Wpadded"
@@ -103,6 +104,13 @@ void require_conform(char const *expected, char const *fmt, ...) {
   }
 }
 }
+
+#define require_equal(EXPECTED, FMT, ...) \
+  [](){ \
+    char buf[256]; \
+    npf_snprintf(buf, sizeof(buf), FMT, __VA_ARGS__); \
+    REQUIRE(std::string{buf} == std::string{EXPECTED}); \
+  }()
 
 TEST_CASE("space flag") {
   require_conform(" 42",             "% d", 42);
@@ -762,9 +770,9 @@ TEST_CASE("types - non-standard format") {
 
 TEST_CASE("pointer") { // everything is IB
 #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
-    require_conform("00", "%.2p", nullptr);
-    require_conform("1234", "%.2p", (void *)0x1234u);
-    require_conform("1234-5678", "%p-%p", (void *)0x1234u, (void *)0x5678u);
+    require_equal("00", "%.2p", nullptr);
+    require_equal("1234", "%.2p", (void *)0x1234u);
+    require_equal("1234-5678", "%p-%p", (void *)0x1234u, (void *)0x5678u);
 #endif
 
   if constexpr (sizeof(void *) == 8) {
