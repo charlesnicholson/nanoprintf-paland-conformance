@@ -772,7 +772,7 @@ TEST_CASE("pointer") { // everything is IB
 #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
     require_equal("00", "%.2p", nullptr);
     require_equal("1234", "%.2p", (void *)0x1234u);
-    require_equal("1234-5678", "%p-%p", (void *)0x1234u, (void *)0x5678u);
+    require_equal("1234-5678", "%.1p-%.3p", (void *)0x1234u, (void *)0x5678u);
 #endif
 
   if constexpr (sizeof(void *) == 8) {
