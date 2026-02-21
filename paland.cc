@@ -49,20 +49,11 @@
 #define NANOPRINTF_IMPLEMENTATION
 #include "../../nanoprintf.h"
 
+#include "../npf_doctest.h"
+
 #if NPF_HAVE_GCC_WARNING_PRAGMAS
   #if NPF_CLANG
     #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
-    #ifndef __APPLE__
-      #pragma GCC diagnostic ignored "-Wreserved-identifier"
-      #pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
-    #endif
-  #endif
-#endif
-
-#include "../doctest.h"
-
-#if NPF_HAVE_GCC_WARNING_PRAGMAS
-  #if NPF_CLANG
     #pragma GCC diagnostic ignored "-Wformat-pedantic"
   #endif
   #pragma GCC diagnostic ignored "-Wold-style-cast"
