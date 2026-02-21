@@ -29,16 +29,6 @@
 // Rewritten for nanoprintf by Charles Nicholson (charles.nicholson@gmail.com)
 // A derivative work of Paland's original, so released under the MIT License.
 
-#ifdef _MSC_VER
-  #pragma warning(disable:4464) // relative include uses ..
-  #pragma warning(disable:4514) // unreferenced inline function removed
-  #pragma warning(disable:4820) // padding after data member
-  #pragma warning(disable:4710) // function not inlined
-  #pragma warning(disable:4711) // selected for inline
-  #pragma warning(disable:5262) // nanoprintf case fallthrough
-  #pragma warning(disable:5264) // const variable not used (shut up doctest)
-#endif
-
 #include <string.h>
 #include <math.h>
 #include <limits>
@@ -50,18 +40,6 @@
 #include "../../nanoprintf.h"
 
 #include "../npf_doctest.h"
-
-#if NPF_HAVE_GCC_WARNING_PRAGMAS
-  #if NPF_CLANG
-    #pragma GCC diagnostic ignored "-Wc++98-compat-pedantic"
-    #pragma GCC diagnostic ignored "-Wformat-pedantic"
-  #endif
-  #pragma GCC diagnostic ignored "-Wold-style-cast"
-  #pragma GCC diagnostic ignored "-Wpadded"
-  #pragma GCC diagnostic ignored "-Wformat"
-  #pragma GCC diagnostic ignored "-Wformat-nonliteral"
-  #pragma GCC diagnostic ignored "-Wformat-security"
-#endif
 
 namespace {
 void require_conform(char const *expected, char const *fmt, ...) {
@@ -750,12 +728,29 @@ TEST_CASE("types - non-standard format") {
 }
 #endif
 
-TEST_CASE("pointer") { // mpaland pads to reg width (non-standard), npf doesn't add 0x.
+TEST_CASE("pointer") { // npf pads to pointer width when precision is enabled.
+#if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
+  #if UINTPTR_MAX > 0xffffffffu
+  require_conform("0000000000001234", "%p", (void *)0x1234u);
+  require_conform("0000000012345678", "%p", (void *)0x12345678u);
+  require_conform(
+    "0000000012345678-000000007edcba98", "%p-%p",
+    (void *)0x12345678u, (void *)0x7edcba98u);
+  require_conform("00000000ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+  #else
+  require_conform("00001234", "%p", (void *)0x1234u);
+  require_conform("12345678", "%p", (void *)0x12345678u);
+  require_conform(
+    "12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
+  require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+  #endif
+#else
   require_conform("1234", "%p", (void *)0x1234u);
   require_conform("12345678", "%p", (void *)0x12345678u);
   require_conform(
     "12345678-7edcba98", "%p-%p", (void *)0x12345678u, (void *)0x7edcba98u);
   require_conform("ffffffff", "%p", (void *)(uintptr_t)0xffffffffu);
+#endif
 }
 
 TEST_CASE("unknown flag (non-standard format)") {
